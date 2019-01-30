@@ -1,6 +1,7 @@
 package com.huarui;
 
 import com.huarui.entity.Book;
+import com.huarui.service.JestClientService;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Index;
@@ -22,6 +23,9 @@ public class EsTest {
 
     @Autowired
     private JestClient jestClient;
+
+    @Autowired
+    private JestClientService jestService;
 
     /**
      * 新增or修改
@@ -54,11 +58,33 @@ public class EsTest {
         }
     }
 
+    /**
+     * 单个查询
+     */
+    @Test
+    public void testGet(){
+        Book book = jestService.get("1", Book.class);
+        System.out.println(book.getName());
+        System.out.println(book.getCode());
+        System.out.println(book.getId());
+        /*if (delete.isSucceeded()){
+            System.out.println("成功");
+        }else {
+            System.out.println("失败");
+        }*/
+    }
+
+    /**
+     * 删除
+     */
     @Test
     public void testDelete(){
-
-
-
+        JestResult delete = jestService.delete("1");
+        if (delete.isSucceeded()){
+            System.out.println("成功");
+        }else {
+            System.out.println("失败");
+        }
     }
 
 }
