@@ -19,7 +19,7 @@ import java.util.Date;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class EsTest {
+public class EsBaseTest {
 
     @Autowired
     private JestClient jestClient;

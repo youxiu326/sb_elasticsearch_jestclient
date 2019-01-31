@@ -254,5 +254,11 @@ public class EsSearchTest {
 
     }
 
+    @Test
+    public void testCount(){
+
+
+    }
+
 
 }
