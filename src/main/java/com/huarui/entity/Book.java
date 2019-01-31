@@ -50,4 +50,13 @@ public class Book extends SearchEntity {
     public void setPrice(float price) {
         this.price = price;
     }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }

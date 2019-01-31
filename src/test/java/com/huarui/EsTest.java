@@ -35,9 +35,9 @@ public class EsTest {
 
         String indexName = "test";
         String indexType = "books";
-        String indexKey = "1";
+        String indexKey = "3";
 
-        Book book = new Book("1",new Date(),"TBS","哈哈哈",1.8F);
+        Book book = new Book("3",new Date(),"SGS","补哈补",0.8F);
 
         Index index = new Index
                 .Builder(book)//文档
