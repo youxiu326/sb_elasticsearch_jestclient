@@ -11,6 +11,4 @@ public class JestExcetion extends Exception {
         super(message);
     }
 
-
-
 }

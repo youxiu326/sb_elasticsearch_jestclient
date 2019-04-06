@@ -1,6 +1,7 @@
 package com.huarui;
 
 import com.huarui.entity.Book;
+import com.huarui.exection.JestExcetion;
 import com.huarui.service.JestClientService;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -62,7 +63,7 @@ public class EsBaseTest {
      * 单个查询
      */
     @Test
-    public void testGet(){
+    public void testGet() throws JestExcetion {
         Book book = jestService.get("1", Book.class);
         System.out.println(book.getName());
         System.out.println(book.getCode());
@@ -78,7 +79,7 @@ public class EsBaseTest {
      * 删除
      */
     @Test
-    public void testDelete(){
+    public void testDelete() throws JestExcetion {
         JestResult delete = jestService.delete("1");
         if (delete.isSucceeded()){
             System.out.println("成功");

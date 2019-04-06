@@ -1,6 +1,7 @@
 package com.huarui;
 
 import com.huarui.entity.Book;
+import com.huarui.entity.User;
 import com.huarui.utils.JsonUtils;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -90,6 +91,22 @@ public class EsSearchTest {
      *
      *
      */
+
+    /**
+     * 全文搜索
+     * @param indexName
+     * @param typeName
+     * @param query
+     * @return
+     * @throws Exception
+     */
+    public static String search(JestClient jestClient,String indexName, String typeName, String query) throws Exception {
+        Search search = new Search.Builder(query).addIndex(indexName).addType(typeName).build();
+        JestResult jr = jestClient.execute(search);
+        System.out.println("--++"+jr.getJsonString());
+        System.out.println("--"+jr.getSourceAsObject(User.class));
+        return jr.getSourceAsString();
+    }
 
 
     /**
