@@ -6,6 +6,7 @@ import com.huarui.service.JestClientService;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Index;
+import io.searchbox.indices.mapping.PutMapping;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,6 @@ public class EsBaseTest {
     @Autowired
     private JestClient jestClient;
 
-    @Autowired
-    private JestClientService jestService;
 
     /**
      * 新增or修改
@@ -34,22 +33,16 @@ public class EsBaseTest {
     @Test
     public void testUpdate(){
 
-        String indexName = "test";
-        String indexType = "books";
-        String indexKey = "3";
+        String indexName = "newIndex";
+        String indexType = "newType";
 
-        Book book = new Book("3",new Date(),"SGS","补哈补",0.8F);
-
-        Index index = new Index
-                .Builder(book)//文档
-                .index(indexName)//索引
-                .type(indexType)//文档类型
-                .id(indexKey)//key
-                .build();
+        String mappingString = "{UserMapper={properties={createtm={analyzer=ik_max_word, type=text, fields={pinyin={analyzer=pinyin_analyzer, type=text}, raw={ignore_above=256, type=keyword}}}, name={analyzer=ik_max_word, type=text, fields={pinyin={analyzer=pinyin_analyzer, type=text}, raw={ignore_above=256, type=keyword}}}, description={analyzer=ik_max_word, type=text, fields={pinyin={analyzer=pinyin_analyzer, type=text}, raw={ignore_above=256, type=keyword}}}, id={type=long}, age={type=integer}}}}";
+        PutMapping.Builder builder = new PutMapping.Builder(indexName, indexType, mappingString);
 
         try {
-            JestResult execute = jestClient.execute(index);
-            if (execute.isSucceeded()){
+            JestResult jestResult = jestClient.execute(builder.build());
+            System.out.println("createIndexMapping result:{}" + jestResult.isSucceeded());
+            if (jestResult.isSucceeded()){
                 System.out.println("成功啦");
             }else {
                 System.out.println("失败啦");
@@ -59,33 +52,5 @@ public class EsBaseTest {
         }
     }
 
-    /**
-     * 单个查询
-     */
-    @Test
-    public void testGet() throws JestExcetion {
-        Book book = jestService.get("1", Book.class);
-        System.out.println(book.getName());
-        System.out.println(book.getCode());
-        System.out.println(book.getId());
-        /*if (delete.isSucceeded()){
-            System.out.println("成功");
-        }else {
-            System.out.println("失败");
-        }*/
-    }
-
-    /**
-     * 删除
-     */
-    @Test
-    public void testDelete() throws JestExcetion {
-        JestResult delete = jestService.delete("1");
-        if (delete.isSucceeded()){
-            System.out.println("成功");
-        }else {
-            System.out.println("失败");
-        }
-    }
 
 }
