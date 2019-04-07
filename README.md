@@ -6,6 +6,9 @@
 http://www.ruanyifeng.com/blog/2017/08/elasticsearch.html
 
 
+springboot+jest 操作Elasticsearch 参考：https://www.cnblogs.com/youxiu326/p/elasticSearch-jestClient.html
+
+
 创建mapper 参考：https://blog.csdn.net/tanga842428/article/details/76229235
 
 1.创建一个索引
