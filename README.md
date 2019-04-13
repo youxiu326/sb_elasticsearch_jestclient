@@ -128,3 +128,48 @@ http://192.168.79.129:9200/productindex/product/_mapping?pretty
     "acknowledged": true
   }
   
+  
+  
+  
+ 
+
+  6.创建索引
+  
+  
+  {
+    "product": {
+        "properties": {
+            "title": {
+                "type": "keyword"
+            },
+            "description": {
+                "type": "keyword"
+            },
+            "price": {
+                "type": "double"
+            },
+            "onSale": {
+                "type": "boolean"
+            },
+            "type": {
+                "type": "integer"
+            },
+            "createDate": {
+                "type": "date"
+            },
+            "colorDetails": {
+                "properties":{
+                    "image": {
+                        "type": "keyword"
+                    },
+                    "code": {
+                        "type": "keyword"
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+  
