@@ -11,6 +11,9 @@ springboot+jest 操作Elasticsearch 参考：https://www.cnblogs.com/youxiu326/p
 
 创建mapper 参考：https://blog.csdn.net/tanga842428/article/details/76229235
 
+中文doc: https://www.elastic.co/guide/cn/elasticsearch/guide/cn/query-time-boosting.html
+
+
 1.创建一个索引
 
 发送post请求:
