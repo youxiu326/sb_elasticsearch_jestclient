@@ -380,5 +380,44 @@ PUT /website/blog/123/_create
 
 
 
+乐观锁并发控制
+curl -X PUT "localhost:9200/website/blog/1?version=1" -H 'Content-Type: application/json' -d'
+{
+  "title": "My first blog entry",
+  "text":  "Starting to get the hang of this..."
+}
+'
+
+``
+所有文档的更新或删除 API，都可以接受 version 参数，这允许你在代码中使用乐观的并发控制，这是一种明智的做法
+``
+
+
+
+文档部分更新
+curl -X POST "localhost:9200/website/blog/1/_update?pretty" -H 'Content-Type: application/json' -d'
+{
+   "doc" : {
+      "tags" : [ "testing" ],
+      "views": 0
+   }
+}
+'
+
+更新失败后重试
+唯一需要做的就是尝试再次更新。
+
+这可以通过 设置参数 retry_on_conflict 来自动完成， 这个参数规定了失败之前 update 应该重试的次数，它的默认值为 0
+
+curl -X POST "localhost:9200/website/pageviews/1/_update?retry_on_conflict=5" -H 'Content-Type: application/json' -d'
+{
+   "script" : "ctx._source.views+=1",
+   "upsert": {
+       "views": 0
+   }
+}
+'
+
+
 
 ```
