@@ -418,6 +418,34 @@ curl -X POST "localhost:9200/website/pageviews/1/_update?retry_on_conflict=5" -H
 }
 '
 
+查看索引 mapping
+http://14565v57k2.iok.la:9200/ur_mall_product_color/product/_mapping
+
+
+分页
+curl -X GET "localhost:9200/_search?size=5"
+curl -X GET "localhost:9200/_search?size=5&from=5"
+curl -X GET "localhost:9200/_search?size=5&from=10"
+
+
+简单搜索
+curl -X GET "localhost:9200/_search?q=mary"
+
+Elasticsearch 是如何在三个不同的字段中查找到结果的呢？
+当索引一个文档的时候，Elasticsearch 取出所有字段的值拼接成一个大的字符串，作为 _all 字段进行索引。例如，当索引这个文档时：
+
+{
+    "tweet":    "However did I manage before Elasticsearch?",
+    "date":     "2014-09-14",
+    "name":     "Mary Jones",
+    "user_id":  1
+}
+
+这就好似增加了一个名叫 _all 的额外字段：
+"However did I manage before Elasticsearch? 2014-09-14 Mary Jones 1"
+除非设置特定字段，否则查询字符串就使用 _all 字段进行搜索。
+
+
 
 
 ```
