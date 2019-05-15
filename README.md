@@ -446,6 +446,78 @@ Elasticsearch 是如何在三个不同的字段中查找到结果的呢？
 除非设置特定字段，否则查询字符串就使用 _all 字段进行搜索。
 
 
+curl -X GET "localhost:9200/website/_mapping/blog?pretty"
+
+```
+
+索引文档链接: https://www.elastic.co/guide/cn/elasticsearch/guide/cn/mapping-intro.html
+
+```
+内部对象的映射
+
+Elasticsearch 会动态 监测新的对象域并映射它们为 对象 ，在 properties 属性下列出内部域：
+
+{
+  "gb": {
+    "tweet": {
+      "properties": {
+        "tweet":            { "type": "string" },
+        "user": {
+          "type":             "object",
+          "properties": {
+            "id":           { "type": "string" },
+            "gender":       { "type": "string" },
+            "age":          { "type": "long"   },
+            "name":   {
+              "type":         "object",
+              "properties": {
+                "full":     { "type": "string" },
+                "first":    { "type": "string" },
+                "last":     { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+根对象
+
+
+
+内部对象
+
+user 和 name 域的映射结构与 tweet 类型的相同。事实上， type 映射只是一种特殊的 对象 映射，我们称之为 根对象 。除了它有一些文档元数据的特殊顶级域，例如 _source 和 _all 域，它和其他对象一样。
+内部对象是如何索引的
+编辑
+
+Lucene 不理解内部对象。 Lucene 文档是由一组键值对列表组成的。为了能让 Elasticsearch 有效地索引内部类，它把我们的文档转化成这样：
+
+{
+    "tweet":            [elasticsearch, flexible, very],
+    "user.id":          [@johnsmith],
+    "user.gender":      [male],
+    "user.age":         [26],
+    "user.name.full":   [john, smith],
+    "user.name.first":  [john],
+    "user.name.last":   [smith]
+}
+
+内部域 可以通过名称引用（例如， first ）。为了区分同名的两个域，我们可以使用全 路径 （例如， user.name.first ） 或 type 名加路径（ tweet.user.name.first ）。
+
+
+-----------------------------------------------
+
+ ``Query DSL``
+是一种非常灵活又富有表现力的 查询语言。 Elasticsearch 使用它可以以简单的 JSON 接口来展现 Lucene 功能的绝大部分。在你的应用中，你应该用它来编写你的查询语句。
+它可以使你的查询语句更灵活、更精确、易读和易调试
+
+
+
 
 
 ```
