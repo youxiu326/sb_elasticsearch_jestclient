@@ -452,6 +452,9 @@ curl -X GET "localhost:9200/website/_mapping/blog?pretty"
 
 索引文档链接: https://www.elastic.co/guide/cn/elasticsearch/guide/cn/mapping-intro.html
 
+
+索引查询例子链接: https://www.elastic.co/guide/cn/elasticsearch/guide/cn/_most_important_queries.html
+
 ```
 内部对象的映射
 
@@ -517,7 +520,64 @@ Lucene 不理解内部对象。 Lucene 文档是由一组键值对列表组成�
 它可以使你的查询语句更灵活、更精确、易读和易调试
 
 
+你可以使用 match 查询语句 来查询 tweet 字段中包含 elasticsearch 的 tweet
+curl -X GET "localhost:9200/_search" -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match": {
+            "tweet": "elasticsearch"
+        }
+    }
+}
+'
+
+multi_match 查询可以在多个字段上执行相同的 match 查询：
+{
+    "multi_match": {
+        "query":    "full text search",
+        "fields":   [ "title", "body" ]
+    }
+}
+
+range 查询找出那些落在指定区间内的数字或者时间
+{
+    "range": {
+        "age": {
+            "gte":  20,
+            "lt":   30
+        }
+    }
+}
+
+被允许的操作符如下：
+
+gt
+    大于
+gte
+    大于等于
+lt
+    小于
+lte
+    小于等于
 
 
+term 查询被用于精确值 匹配，这些精确值可能是数字、时间、布尔或者那些 not_analyzed 的字符串
+{ "term": { "age":    26           }}
+{ "term": { "date":   "2014-09-01" }}
+{ "term": { "public": true         }}
+{ "term": { "tag":    "full_text"  }}
+
+terms 查询和 term 查询一样，但它允许你指定多值进行匹配。如果这个字段包含了指定值中的任何一个值，那么这个文档满足条件：
+{ "terms": { "tag": [ "search", "full_text", "nosql" ] }}
+
+
+exists 查询和 missing 查询被用于查找那些指定字段中有值 (exists) 或无值 (missing) 的文档。
+这与SQL中的 IS_NULL (missing) 和 NOT IS_NULL (exists) 在本质上具有共性
+
+{
+    "exists":   {
+        "field":    "title"
+    }
+}
 
 ```
