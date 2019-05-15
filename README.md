@@ -324,4 +324,61 @@ get http://youxiu326.xin:9200/megacorp/employee/_search?pretty
 
 }
 
+
+```
+
+----------------------------------
+
+创建文档 顺便创建索引 类型 指定id
+
+```
+put http://youxiu326.xin:9200/website/blog/123
+
+{
+  "title": "My first blog entry",
+  "text":  "Just trying this out...",
+  "date":  "2014/01/01"
+}
+
+创建文档 不指定id
+post http://youxiu326.xin:9200/website/blog
+{
+  "title": "My second blog entry",
+  "text":  "Still trying this out...",
+  "date":  "2014/01/01"
+}
+
+取回一个文档
+curl -X GET "localhost:9200/website/blog/123?pretty"
+
+返回文档的一部分
+curl -X GET "localhost:9200/website/blog/123?_source=title,text"
+
+如果你只想得到 _source 字段，不需要任何元数据，你能使用 _source 端点
+curl -X GET "localhost:9200/website/blog/123/_source"
+
+检查文档是否存在
+如果只想检查一个文档是否存在 --根本不想关心内容--那么用 HEAD 方法来代替 GET 方法。 HEAD 请求没有返回体，只返回一个 HTTP 请求报头：
+curl -i -XHEAD http://localhost:9200/website/blog/123
+
+
+``
+在内部，Elasticsearch 已将旧文档标记为已删除，并增加一个全新的文档。 尽管你不能再对旧版本的文档进行访问，但它并不会立即消失。当继续索引更多的数据，Elasticsearch 会在后台清理这些已删除文档
+``
+
+然而，如果已经有自己的 _id ，那么我们必须告诉 Elasticsearch ，只有在相同的 _index 、 _type 和 _id 不存在时才接受我们的索引请求。这里有两种方式，他们做的实际是相同的事情。
+使用哪种，取决于哪种使用起来更方便
+第一种方法使用 op_type 查询 -字符串参数：
+
+PUT /website/blog/123?op_type=create
+{ ... }
+
+第二种方法是在 URL 末端使用 /_create :
+
+PUT /website/blog/123/_create
+{ ... }
+
+
+
+
 ```
