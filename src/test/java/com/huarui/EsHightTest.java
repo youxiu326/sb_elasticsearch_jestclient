@@ -29,6 +29,10 @@ public class EsHightTest {
     // 参考博客: https://www.cnblogs.com/wenbronk/p/6432990.html
 
 
+
+
+
+
     @Autowired
     private JestClient jestClient;
 

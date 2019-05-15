@@ -266,4 +266,62 @@ curl -X GET "localhost:9200/megacorp/employee/_search" -H 'Content-Type: applica
 }
 
 
+找出一个属性中的独立单词是没有问题的，但有时候想要精确匹配一系列单词或者短语 。 比如， 我们想执行这样一个查询，仅匹配同时包含 “rock” 和 “climbing” ，并且 二者以短语 “rock climbing” 的形式紧挨着的雇员记录。
+curl -X GET "localhost:9200/megacorp/employee/_search" -H 'Content-Type: application/json' -d'
+{
+    "query" : {
+        "match_phrase" : {
+            "about" : "rock climbing"
+        }
+    }
+}
+'
+
+
+高亮查询
+许多应用都倾向于在每个搜索结果中 高亮 部分文本片段，以便让用户知道为何该文档符合查询条件。在 Elasticsearch 中检索出高亮片段也很容易。
+再次执行前面的查询，并增加一个新的 highlight 参数
+curl -X GET "localhost:9200/megacorp/employee/_search" -H 'Content-Type: application/json' -d'
+{
+    "query" : {
+        "match_phrase" : {
+            "about" : "rock climbing"
+        }
+    },
+    "highlight": {
+        "fields" : {
+            "about" : {}
+        }
+    }
+}
+'
+
+分析
+终于到了最后一个业务需求：支持管理者对雇员目录做分析。 Elasticsearch 有一个功能叫聚合（aggregations），允许我们基于数据生成一些精细的分析结果。聚合与 SQL 中的 GROUP BY 类似但更强大。
+举个例子，挖掘出雇员中最受欢迎的兴趣爱好：
+get http://youxiu326.xin:9200/megacorp/employee/_search?pretty
+{
+
+	"aggs": {
+	    "all_interests": {
+	      "terms": { "field": "interests" }
+	    }
+	  }
+
+}
+
+{
+	"query": {
+	    "match": {
+	      "last_name": "smith"
+	    }
+	  },
+	"aggs": {
+	    "all_interests": {
+	      "terms": { "field": "interests" }
+	    }
+	  }
+
+}
+
 ```
