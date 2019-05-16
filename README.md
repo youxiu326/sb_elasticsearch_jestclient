@@ -488,10 +488,23 @@ Elasticsearch 会动态 监测新的对象域并映射它们为 对象 ，在 pr
 
 
 
+aliasName:{
+	"type":"text"
+	"fields":{
+		"keyword":{
+			"type":"keyword",
+			"ignore_above":256
+		}
+		"pinyin"{
+			"type":"text",
+			"analyzer":"pinyin"
+		}
+	}
+	"analyzer":"ik_max_word"
+}
+
+
 根对象
-
-
-
 内部对象
 
 user 和 name 域的映射结构与 tweet 类型的相同。事实上， type 映射只是一种特殊的 对象 映射，我们称之为 根对象 。除了它有一些文档元数据的特殊顶级域，例如 _source 和 _all 域，它和其他对象一样。
@@ -595,4 +608,150 @@ should
 filter
     必须 匹配，但它以不评分、过滤模式来进行。这些语句对评分没有贡献，只是根据过滤标准来排除或包含文档
 
+
+下面的查询用于查找 title 字段匹配 how to make millions
+并且不被标识为 spam 的文档。那些被标识为 starred 或在2014之后的文档，
+将比另外那些文档拥有更高的排名。如果 _两者_ 都满足，那么它排名将更高：
+
+
+{
+    "bool": {
+        "must":     { "match": { "title": "how to make millions" }},
+        "must_not": { "match": { "tag":   "spam" }},
+        "should": [
+            { "match": { "tag": "starred" }},
+            { "range": { "date": { "gte": "2014-01-01" }}}
+        ]
+    }
+}
+
+
+如果我们不想因为文档的时间而影响得分，可以用 filter 语句来重写前面的例子
+{
+    "bool": {
+        "must":     { "match": { "title": "how to make millions" }},
+        "must_not": { "match": { "tag":   "spam" }},
+        "should": [
+            { "match": { "tag": "starred" }}
+        ],
+        "filter": {
+          "range": { "date": { "gte": "2014-01-01" }}
+        }
+    }
+}
+
+
+通过将 range 查询移到 filter 语句中，我们将它转成不评分的查询，将不再影响文档的相关性排名。由于它现在是一个不评分的查询，可以使用各种对 filter 查询有效的优化手段来提升性能。
+所有查询都可以借鉴这种方式。将查询移到 bool 查询的 filter 语句中，这样它就自动的转成一个不评分的 filter 了。
+如果你需要通过多个不同的标准来过滤你的文档，bool 查询本身也可以被用做不评分的查询。简单地将它放置到 filter 语句中并在内部构建布尔逻辑：
+{
+    "bool": {
+        "must":     { "match": { "title": "how to make millions" }},
+        "must_not": { "match": { "tag":   "spam" }},
+        "should": [
+            { "match": { "tag": "starred" }}
+        ],
+        "filter": {
+          "bool": {
+              "must": [
+                  { "range": { "date": { "gte": "2014-01-01" }}},
+                  { "range": { "price": { "lte": 29.99 }}}
+              ],
+              "must_not": [
+                  { "term": { "category": "ebooks" }}
+              ]
+          }
+        }
+    }
+}
+
+``验证查询``
+查询可以变得非常的复杂，尤其 和不同的分析器与不同的字段映射结合时，理解起来就有点困难了。
+不过 validate-query API 可以用来验证查询是否合法
+为了找出 查询不合法的原因，可以将 explain 参数 加到查询字符串中：
+
+curl -X GET "localhost:9200/gb/tweet/_validate/query?explain" -H 'Content-Type: application/json' -d'
+{
+   "query": {
+      "tweet" : {
+         "match" : "really powerful"
+      }
+   }
+}
+'
+
 ```
+
+##### 排序
+
+```
+为了按照相关性来排序，需要将相关性表示为一个数值。在 Elasticsearch 中， 相关性得分 由一个浮点数进行表示，并在搜索结果中通过 _score 参数返回， 默认排序是 _score 降序。
+有时，相关性评分对你来说并没有意义。例如，下面的查询返回所有 user_id 字段包含 1 的结果：
+
+GET /_search
+{
+    "query" : {
+        "bool" : {
+            "filter" : {
+                "term" : {
+                    "user_id" : 1
+                }
+            }
+        }
+    }
+}
+
+这里没有一个有意义的分数：因为我们使用的是 filter （过滤），这表明我们只希望获取匹配 user_id: 1 的文档，并没有试图确定这些文档的相关性。
+ 实际上文档将按照随机顺序返回，并且每个文档都会评为零分。
+
+如果评分为零对你造成了困扰，你可以使用 constant_score 查询进行替代：
+GET /_search
+{
+    "query" : {
+        "constant_score" : {
+            "filter" : {
+                "term" : {
+                    "user_id" : 1
+                }
+            }
+        }
+    }
+}
+
+这将让所有文档应用一个恒定分数（默认为 1 ）。它将执行与前述查询相同的查询，并且所有的文档将像之前一样随机返回，这些文档只是有了一个分数而不是零分
+
+
+按照字段的排序
+在这个案例中，通过时间来对 tweets 进行排序是有意义的，最新的 tweets 排在最前。 我们可以使用 sort 参数进行实现：
+curl -X GET "localhost:9200/_search" -H 'Content-Type: application/json' -d'
+{
+    "query" : {
+        "bool" : {
+            "filter" : { "term" : { "user_id" : 1 }}
+        }
+    },
+    "sort": { "date": { "order": "desc" }}
+}
+'
+
+
+假定我们想要结合使用 date 和 _score 进行查询，并且匹配的结果首先按照日期排序，然后按照相关性排序
+curl -X GET "localhost:9200/_search" -H 'Content-Type: application/json' -d'
+{
+    "query" : {
+        "bool" : {
+            "must":   { "match": { "tweet": "manage text search" }},
+            "filter" : { "term" : { "user_id" : 2 }}
+        }
+    },
+    "sort": [
+        { "date":   { "order": "desc" }},
+        { "_score": { "order": "desc" }}
+    ]
+}
+'
+
+
+```
+
+
