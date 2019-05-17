@@ -755,3 +755,266 @@ curl -X GET "localhost:9200/_search" -H 'Content-Type: application/json' -d'
 ```
 
 
+http://14565v57k2.iok.la:9200/ur_mall_product_color/product/_mapping
+
+
+```
+取部分文档
+
+GET ur_mall_product_color/product/_search
+{
+	"from": 0,
+	"size": 20,
+	"_source": ["code"],
+	"query": {
+		"bool": {
+			"must": [{
+				"bool": {
+					"should": [{
+						"terms": {
+							"categorySales.id": ["ff80808162e0be970162e1498a260005"],
+							"boost": 1.0
+						}
+					}, {
+						"terms": {
+							"categorySales.lowerCategory.id": ["ff80808162e0be970162e1498a260005"],
+							"boost": 1.0
+						}
+					}, {
+						"terms": {
+							"categorySales.lowerCategory.lowerCategory.id": ["ff80808162e0be970162e1498a260005"],
+							"boost": 1.0
+						}
+					}],
+					"adjust_pure_negative": true,
+					"boost": 1.0
+				}
+			}, {
+				"term": {
+					"status": {
+						"value": 1,
+						"boost": 1.0
+					}
+				}
+			}],
+			"should": [{
+				"term": {
+					"recommend": {
+						"value": true,
+						"boost": 1.0
+					}
+				}
+			}, {
+				"range": {
+					"onLineDate": {
+						"from": "2019-05-05",
+						"to": null,
+						"include_lower": true,
+						"include_upper": true,
+						"boost": 1.0
+					}
+				}
+			}, {
+				"terms": {
+					"season": ["冬季"],
+					"boost": 1.0
+				}
+			}, {
+				"range": {
+					"salesVolume": {
+						"from": 51,
+						"to": null,
+						"include_lower": true,
+						"include_upper": true,
+						"boost": 9.0
+					}
+				}
+			}, {
+				"range": {
+					"collectVolume": {
+						"from": 51,
+						"to": null,
+						"include_lower": true,
+						"include_upper": true,
+						"boost": 10.0
+					}
+				}
+			}, {
+				"term": {
+					"code": {
+						"value": "MV09S6BN2000",
+						"boost": 100.0
+					}
+				}
+			}, {
+				"term": {
+					"code": {
+						"value": "MF22S2BE2001",
+						"boost": 110.0
+					}
+				}
+			}, {
+				"term": {
+					"code": {
+						"value": "ML20S2CN2003",
+						"boost": 120.0
+					}
+				}
+			}, {
+				"terms": {
+					"category.keyword": ["测试小品类"],
+					"boost": 100.0
+				}
+			}, {
+				"terms": {
+					"series.keyword": [""],
+					"boost": 1.0
+				}
+			}, {
+				"terms": {
+					"models.keyword": [""],
+					"boost": 1.0
+				}
+			}],
+			"adjust_pure_negative": true,
+			"boost": 1.0
+		}
+	},
+	"highlight": {
+		"pre_tags": ["<strong>"],
+		"post_tags": ["</strong>"],
+		"fields": {
+			"name": {}
+		}
+	}
+}
+
+GET ur_mall_product_color/product/_search
+{
+  "query" : {
+  "bool" : {
+    "must" : [
+      {
+        "bool" : {
+          "should" : [
+            {
+              "terms" : {
+                "categorySales.id" : [
+                  "402882ee62dc8b2a0162dc9a76a30183"
+                ],
+                "boost" : 1.0
+              }
+            },
+            {
+              "terms" : {
+                "categorySales.lowerCategory.id" : [
+                  "402882ee62dc8b2a0162dc9a76a30183"
+                ],
+                "boost" : 1.0
+              }
+            },
+            {
+              "terms" : {
+                "categorySales.lowerCategory.lowerCategory.id" : [
+                  "402882ee62dc8b2a0162dc9a76a30183"
+                ],
+                "boost" : 1.0
+              }
+            }
+          ],
+          "adjust_pure_negative" : true,
+          "boost" : 1.0
+        }
+      },
+      {
+        "term" : {
+          "status" : {
+            "value" : 1,
+            "boost" : 1.0
+          }
+        }
+      }
+    ],
+    "should" : [
+      {
+        "term" : {
+          "recommend" : {
+            "value" : true,
+            "boost" : 1.0
+          }
+        }
+      },
+      {
+        "range" : {
+          "onLineDate" : {
+            "from" : "2019-05-08",
+            "to" : null,
+            "include_lower" : true,
+            "include_upper" : true,
+            "boost" : 1.0
+          }
+        }
+      },
+      {
+        "terms" : {
+          "season" : [
+            "夏季"
+          ],
+          "boost" : 1.0
+        }
+      },
+      {
+        "terms" : {
+          "category.keyword" : [
+            "A型半裙"
+          ],
+          "boost" : 10.0
+        }
+      },
+      {
+        "range" : {
+          "salesVolume" : {
+            "from" : 10,
+            "to" : 20,
+            "include_lower" : true,
+            "include_upper" : true,
+            "boost" : 1.0
+          }
+        }
+      },
+      {
+        "range" : {
+          "collectVolume" : {
+            "from" : 10,
+            "to" : 20,
+            "include_lower" : true,
+            "include_upper" : true,
+            "boost" : 1.0
+          }
+        }
+      },
+      {
+        "terms" : {
+          "series" : [
+            "出错"
+          ],
+          "boost" : 1.0
+        }
+      },
+      {
+        "terms" : {
+          "models.keyword" : [
+            "测试"
+          ],
+          "boost" : 100.0
+        }
+      }
+    ],
+    "adjust_pure_negative" : true,
+    "boost" : 1.0
+  }
+  }
+}
+
+
+```
