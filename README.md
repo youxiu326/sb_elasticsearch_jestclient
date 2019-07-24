@@ -755,7 +755,7 @@ curl -X GET "localhost:9200/_search" -H 'Content-Type: application/json' -d'
 ```
 
 
-http://14565v57k2.iok.la:9200/ur_mall_product_color/product/_mapping
+http://xxxx:9200/ur_mall_product_color/product/_mapping
 
 
 ```
